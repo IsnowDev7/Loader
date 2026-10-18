@@ -1097,7 +1097,7 @@ function Library:Window(o)
 	local okp = pcall(function() Gui.Parent = (gethui and gethui()) or game:GetService("CoreGui") end)
 	if not okp or not Gui.Parent then Gui.Parent = Players.LocalPlayer:WaitForChild("PlayerGui") end
 
-	Root = New("Frame", { Name = "Window", AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.fromScale(0.5, 0.5),
+	Root = New("CanvasGroup", { Name = "Window", AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.fromScale(0.5, 0.5),
 		Size = UDim2.fromOffset(DESIGN_W, DESIGN_H), BackgroundColor3 = WHITE, BackgroundTransparency = 0.04,
 		BorderSizePixel = 0, ZIndex = 1 }, Gui)
 	Corner(Root, 18)
@@ -1116,15 +1116,19 @@ function Library:Window(o)
 			Root.Visible = true
 			if instant then
 				Blur.Size = 18
+				Root.GroupTransparency = 0
 			else
 				TweenService:Create(Blur, Tw(0.3), { Size = 18 }):Play()
+				TweenService:Create(Root, Tw(0.3), { GroupTransparency = 0 }):Play()
 			end
 		else
-			local tween = TweenService:Create(Blur, Tw(0.25, nil, Enum.EasingDirection.In), { Size = 0 })
-			tween:Play()
+			local blurTween = TweenService:Create(Blur, Tw(0.3, nil, Enum.EasingDirection.In), { Size = 0 })
+			local rootTween = TweenService:Create(Root, Tw(0.3, nil, Enum.EasingDirection.In), { GroupTransparency = 1 })
+			blurTween:Play()
+			rootTween:Play()
 			if not instant then
 				task.spawn(function()
-					tween.Completed:Wait()
+					rootTween.Completed:Wait()
 					if generation == BlurGeneration and not Destroyed and Root.Parent then Root.Visible = false end
 				end)
 			else
