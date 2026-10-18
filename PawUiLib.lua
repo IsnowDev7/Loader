@@ -57,13 +57,13 @@ local function ApplyIcon(Object, Icon)
 end
 
 local C = {
-	Box = Color3.fromRGB(21, 19, 25),
-	Line = Color3.fromRGB(72, 66, 74),
-	Off = Color3.fromRGB(112, 107, 114),
-	On = Color3.fromRGB(245, 240, 246),
-	BoxStroke = Color3.fromRGB(58, 52, 62),
+	Box = Color3.fromRGB(242, 238, 246),
+	Line = Color3.fromRGB(198, 188, 207),
+	Off = Color3.fromRGB(112, 101, 123),
+	On = Color3.fromRGB(48, 39, 58),
+	BoxStroke = Color3.fromRGB(213, 202, 222),
 }
-local DIM = Color3.fromRGB(135, 129, 138)
+local DIM = Color3.fromRGB(126, 112, 138)
 local FONT = Enum.Font.GothamMedium
 local WHITE = Color3.new(1, 1, 1)
 local MB1, TOUCH = Enum.UserInputType.MouseButton1, Enum.UserInputType.Touch
@@ -115,7 +115,7 @@ local function QueueTeleport(code)
 	return pcall(queue, code)
 end
 
-local Accent = Color3.fromRGB(255, 205, 245)
+local Accent = Color3.fromRGB(170, 105, 225)
 local Hooks = {}
 local function AccentSeq() return ColorSequence.new(Accent:Lerp(WHITE, 0.35), Accent) end
 local function OnAccent(obj, fn) table.insert(Hooks, { obj, fn }); fn() end
@@ -133,7 +133,7 @@ local Folder, AutoFile = "Paw", "Paw/autoload.txt"
 local AllScrollers = {}
 local Config, Callbacks, Registry, Refreshers = {}, {}, {}, {}
 local Presets = {
-	Color3.fromRGB(255, 205, 245), Color3.fromRGB(255, 120, 120), Color3.fromRGB(255, 185, 110),
+	Color3.fromRGB(170, 105, 225), Color3.fromRGB(255, 120, 120), Color3.fromRGB(255, 185, 110),
 	Color3.fromRGB(255, 235, 130), Color3.fromRGB(140, 235, 150), Color3.fromRGB(120, 220, 255),
 	Color3.fromRGB(150, 150, 255),
 }
@@ -322,8 +322,8 @@ local function MakeOverlay(x, y, w, h)
 	Drop = New("Frame", { BackgroundColor3 = WHITE, BorderSizePixel = 0, ZIndex = 70,
 		Position = UDim2.fromOffset(x, y + 8), Size = UDim2.fromOffset(w, h) }, Root)
 	Corner(Drop, 8)
-	Grad(Drop, Color3.fromRGB(68, 60, 70), Color3.fromRGB(36, 31, 40), 60)
-	Grad(Stroke(Drop, WHITE, 1, 0.1), Color3.fromRGB(110, 90, 106), Color3.fromRGB(170, 120, 160), 45)
+	Grad(Drop, Color3.fromRGB(248, 245, 250), Color3.fromRGB(232, 225, 237), 60)
+	Grad(Stroke(Drop, WHITE, 1, 0.1), Color3.fromRGB(190, 165, 205), Color3.fromRGB(145, 105, 175), 45)
 	TweenService:Create(Drop, Tw(0.12), { Position = UDim2.fromOffset(x, y) }):Play()
 	return Drop
 end
@@ -366,7 +366,7 @@ local function OpenList(anchor, e, mode, refresh)
 		for i, it in ipairs(e.list) do
 			if f == "" or it:lower():find(f, 1, true) then
 				local sel = isSel(it)
-				local b = New("TextButton", { Text = "", AutoButtonColor = false, BackgroundColor3 = Color3.fromRGB(96, 78, 100),
+				local b = New("TextButton", { Text = "", AutoButtonColor = false, BackgroundColor3 = Color3.fromRGB(235, 220, 242),
 					BackgroundTransparency = sel and 0.45 or 1, BorderSizePixel = 0, Size = UDim2.new(1, 0, 0, 32), LayoutOrder = i }, sf)
 				Corner(b, 6)
 				New("TextLabel", { BackgroundTransparency = 1, Text = it, Font = FONT, TextSize = 19,
@@ -406,7 +406,7 @@ local function OpenPicker(anchor, title, get, set)
 	local y = a.Y + sz.Y + 6
 	if y + h > DESIGN_H - 10 then y = math.max(a.Y - h - 6, 10) end
 	local D = MakeOverlay(x, y, w, h)
-	Text(D, title, 16, 26, 260, 21, Color3.fromRGB(205, 200, 207))
+	Text(D, title, 16, 26, 260, 21, Color3.fromRGB(70, 62, 78))
 
 	local hh, ss, vv = (get() or Presets[1]):ToHSV()
 
@@ -450,7 +450,7 @@ local function OpenPicker(anchor, title, get, set)
 	local prev = New("Frame", { BackgroundColor3 = WHITE, BorderSizePixel = 0, Position = UDim2.fromOffset(142, 262),
 		Size = UDim2.fromOffset(40, 34) }, D)
 	Corner(prev, 6)
-	Stroke(prev, Color3.fromRGB(90, 80, 92), 1, 0.2)
+	Stroke(prev, Color3.fromRGB(175, 158, 187), 1, 0.2)
 	local rgb = Text(D, "", 192, 279, 92, 17, C.Off, Enum.TextXAlignment.Right)
 
 	local function update(fire)
@@ -568,8 +568,8 @@ local function AddWidget(parent, e, x, y, w)
 		local bg = New("Frame", { BackgroundColor3 = WHITE, BorderSizePixel = 0, Position = UDim2.fromOffset(x, cy - 17),
 			Size = UDim2.fromOffset(w, 34) }, parent)
 		Corner(bg, 8)
-		Grad(bg, Color3.fromRGB(98, 80, 102), Color3.fromRGB(60, 50, 64), 0)
-		Grad(Stroke(bg, WHITE, 1, 0.2), Color3.fromRGB(110, 90, 106), Color3.fromRGB(170, 120, 160), 45)
+		Grad(bg, Color3.fromRGB(235, 222, 242), Color3.fromRGB(218, 200, 230), 0)
+		Grad(Stroke(bg, WHITE, 1, 0.2), Color3.fromRGB(190, 165, 205), Color3.fromRGB(145, 105, 175), 45)
 		local b = New("TextButton", { Text = e.n, Font = FONT, TextSize = 20, TextColor3 = C.On, AutoButtonColor = false,
 			BackgroundTransparency = 1, BorderSizePixel = 0, Size = UDim2.fromScale(1, 1) }, bg)
 		b.MouseButton1Click:Connect(function()
@@ -613,10 +613,10 @@ local function OpenPopup(title, anchor, entries, posFn, popName)
 		Position = UDim2.fromOffset(pos.X, pos.Y + 10), Size = UDim2.fromOffset(w, h) }, Root)
 	Popup.Name = popName or "Popup"
 	Corner(Popup, 8)
-	Grad(Popup, Color3.fromRGB(66, 58, 68), Color3.fromRGB(38, 33, 42), 60)
-	Grad(Stroke(Popup, WHITE, 1, 0.1), Color3.fromRGB(110, 90, 106), Color3.fromRGB(170, 120, 160), 45)
+	Grad(Popup, Color3.fromRGB(248, 245, 250), Color3.fromRGB(232, 225, 237), 60)
+	Grad(Stroke(Popup, WHITE, 1, 0.1), Color3.fromRGB(190, 165, 205), Color3.fromRGB(145, 105, 175), 45)
 	TweenService:Create(Popup, Tw(0.12), { Position = UDim2.fromOffset(pos.X, pos.Y) }):Play()
-	Text(Popup, title, 16, 28, 300, 21, Color3.fromRGB(205, 200, 207))
+	Text(Popup, title, 16, 28, 300, 21, Color3.fromRGB(70, 62, 78))
 	local y = 52
 	for _, e in ipairs(entries) do y += AddWidget(Popup, e, 16, y, 357) end
 end
@@ -1041,9 +1041,9 @@ local function MakePanel(parent, title, icon, order)
 	local p = New("Frame", { BackgroundColor3 = WHITE, BorderSizePixel = 0, Size = UDim2.fromOffset(412, 75),
 		LayoutOrder = order }, parent)
 	Corner(p, 10)
-	local g = Grad(p, Color3.fromRGB(64, 57, 67), Color3.fromRGB(44, 38, 48), 90)
+	local g = Grad(p, Color3.fromRGB(248, 244, 250), Color3.fromRGB(232, 224, 238), 90)
 	g.Transparency = NumberSequence.new(0.35, 0.55)
-	Grad(Stroke(p, WHITE, 1, 0.2), Color3.fromRGB(84, 70, 82), Color3.fromRGB(190, 130, 175), 55)
+	Grad(Stroke(p, WHITE, 1, 0.2), Color3.fromRGB(195, 170, 205), Color3.fromRGB(145, 95, 180), 55)
 	local bar = New("Frame", { BackgroundColor3 = WHITE, BorderSizePixel = 0,
 		Position = UDim2.fromOffset(13, 15), Size = UDim2.fromOffset(6, 26) }, p)
 	Corner(bar, 3)
@@ -1052,7 +1052,7 @@ local function MakePanel(parent, title, icon, order)
 	local pic = Icon(p, icon, 44, 28, 22, WHITE)
 	local pig = New("UIGradient", { Rotation = 45 }, pic)
 	OnAccent(pic, function() pig.Color = AccentSeq() end)
-	Text(p, title, 64, 28, 280, 21, Color3.fromRGB(178, 171, 181))
+	Text(p, title, 64, 28, 280, 21, Color3.fromRGB(85, 76, 92))
 	Line(p, 13, 55, 386)
 	return p
 end
@@ -1101,8 +1101,8 @@ function Library:Window(o)
 		Size = UDim2.fromOffset(DESIGN_W, DESIGN_H), BackgroundColor3 = WHITE, BackgroundTransparency = 0.04,
 		BorderSizePixel = 0, ZIndex = 1 }, Gui)
 	Corner(Root, 18)
-	Grad(Root, Color3.fromRGB(72, 62, 74), Color3.fromRGB(36, 30, 40), 55, Color3.fromRGB(48, 42, 51))
-	Grad(Stroke(Root, WHITE, 1.5, 0.15), Color3.fromRGB(120, 98, 118), Color3.fromRGB(58, 50, 62), 45)
+	Grad(Root, Color3.fromRGB(245, 240, 248), Color3.fromRGB(225, 216, 232), 55, Color3.fromRGB(235, 228, 240))
+	Grad(Stroke(Root, WHITE, 1.5, 0.15), Color3.fromRGB(180, 150, 195), Color3.fromRGB(205, 190, 215), 45)
 	Scale = New("UIScale", {}, Root)
 
 	local previousBlur = Lighting:FindFirstChild("PawUiBlur")
@@ -1202,10 +1202,10 @@ function Library:Window(o)
 
 	local Sidebar = New("Frame", { BackgroundColor3 = WHITE, BorderSizePixel = 0, Size = UDim2.fromOffset(97, DESIGN_H) }, Root)
 	Corner(Sidebar, 18)
-	Grad(Sidebar, Color3.fromRGB(34, 31, 38), Color3.fromRGB(19, 17, 23), 90)
+	Grad(Sidebar, Color3.fromRGB(248, 245, 250), Color3.fromRGB(232, 225, 237), 90)
 	local Filler = New("Frame", { BackgroundColor3 = WHITE, BorderSizePixel = 0,
 		Position = UDim2.fromOffset(60, 0), Size = UDim2.fromOffset(37, DESIGN_H) }, Sidebar)
-	Grad(Filler, Color3.fromRGB(34, 31, 38), Color3.fromRGB(19, 17, 23), 90)
+	Grad(Filler, Color3.fromRGB(248, 245, 250), Color3.fromRGB(232, 225, 237), 90)
 
 	local Mark = Icon(Sidebar, Logo, 46, 45, 46, WHITE)
 	local markGrad = New("UIGradient", {}, Mark)
@@ -1215,7 +1215,7 @@ function Library:Window(o)
 	local SideSel = New("Frame", { BackgroundColor3 = WHITE, BorderSizePixel = 0, AnchorPoint = Vector2.new(0.5, 0.5),
 		Position = UDim2.fromOffset(46, 143), Size = UDim2.fromOffset(62, 62), Visible = false }, Sidebar)
 	Corner(SideSel, 12)
-	Grad(SideSel, Color3.fromRGB(92, 76, 96), Color3.fromRGB(58, 49, 62), 45)
+	Grad(SideSel, Color3.fromRGB(225, 210, 240), Color3.fromRGB(208, 190, 220), 45)
 
 	MakeDraggable(Sidebar, Root, WindowClamp)
 	local TopHandle = New("TextButton", { Text = "", AutoButtonColor = false, BackgroundTransparency = 1,
@@ -1276,8 +1276,8 @@ function Library:Window(o)
 
 		local bg = New("Frame", { BackgroundColor3 = WHITE, BorderSizePixel = 0, Size = UDim2.fromScale(1, 1) }, card)
 		Corner(bg, 8)
-		Grad(bg, Color3.fromRGB(66, 58, 68), Color3.fromRGB(38, 33, 42), 60)
-		Grad(Stroke(bg, WHITE, 1, 0.1), Color3.fromRGB(110, 90, 106), Color3.fromRGB(170, 120, 160), 45)
+		Grad(bg, Color3.fromRGB(248, 245, 250), Color3.fromRGB(232, 225, 237), 60)
+		Grad(Stroke(bg, WHITE, 1, 0.1), Color3.fromRGB(190, 165, 205), Color3.fromRGB(145, 105, 175), 45)
 
 		local bar = New("Frame", { BackgroundColor3 = WHITE, BorderSizePixel = 0, Position = UDim2.fromOffset(12, 12),
 			Size = UDim2.fromOffset(4, h - 28) }, card)
@@ -1474,7 +1474,7 @@ function Library:Window(o)
 		tab.Pill = New("Frame", { BackgroundColor3 = WHITE, BackgroundTransparency = 0.2, BorderSizePixel = 0, Visible = false,
 			Position = UDim2.fromOffset(TAB_PAD, 11), Size = UDim2.fromOffset(274, 54) }, tab.Scroll)
 		Corner(tab.Pill, 10)
-		Grad(tab.Pill, Color3.fromRGB(134, 110, 134), Color3.fromRGB(92, 76, 96), 0)
+		Grad(tab.Pill, Color3.fromRGB(134, 110, 134), Color3.fromRGB(225, 210, 240), 0)
 		tab.Scroll.InputChanged:Connect(function(inp)
 			if tab.Scrolling and inp.UserInputType == Enum.UserInputType.MouseWheel then
 				local maxX = math.max(0, (tab.Scroll.AbsoluteCanvasSize.X - tab.Scroll.AbsoluteSize.X) / Scale.Scale)
@@ -1586,8 +1586,8 @@ function Library:Window(o)
 		local KbBg = New("TextButton", { Text = "", AutoButtonColor = false, BackgroundColor3 = WHITE, BorderSizePixel = 0,
 			Size = UDim2.fromScale(1, 1) }, KbRoot)
 		Corner(KbBg, 8)
-		Grad(KbBg, Color3.fromRGB(66, 58, 68), Color3.fromRGB(38, 33, 42), 60)
-		Grad(Stroke(KbBg, WHITE, 1, 0.1), Color3.fromRGB(110, 90, 106), Color3.fromRGB(170, 120, 160), 45)
+		Grad(KbBg, Color3.fromRGB(248, 245, 250), Color3.fromRGB(232, 225, 237), 60)
+		Grad(Stroke(KbBg, WHITE, 1, 0.1), Color3.fromRGB(190, 165, 205), Color3.fromRGB(145, 105, 175), 45)
 		MakeDraggable(KbBg, KbRoot, KbClamp)
 
 		local bar = New("Frame", { BackgroundColor3 = WHITE, BorderSizePixel = 0, Position = UDim2.fromOffset(13, 14),
@@ -1595,7 +1595,7 @@ function Library:Window(o)
 		Corner(bar, 3)
 		local bg = New("UIGradient", { Rotation = 90 }, bar)
 		OnAccent(bar, function() bg.Color = AccentSeq() end)
-		Text(KbBg, "keybind list", 30, 26, 240, 21, Color3.fromRGB(205, 200, 207))
+		Text(KbBg, "keybind list", 30, 26, 240, 21, Color3.fromRGB(70, 62, 78))
 		Line(KbBg, 13, 50, 274)
 		local KbHolder = New("Frame", { BackgroundTransparency = 1, Position = UDim2.fromOffset(0, 56),
 			Size = UDim2.new(1, 0, 0, 0) }, KbBg)
@@ -1669,8 +1669,8 @@ function Library:Window(o)
 			Visible = false, AutomaticSize = Enum.AutomaticSize.X, AnchorPoint = Vector2.new(1, 0),
 			Position = UDim2.new(1, -16, 0, 16), Size = UDim2.fromOffset(0, 40), ZIndex = 2 }, Gui)
 		Corner(WmRoot, 8)
-		Grad(WmRoot, Color3.fromRGB(66, 58, 68), Color3.fromRGB(38, 33, 42), 60)
-		Grad(Stroke(WmRoot, WHITE, 1, 0.1), Color3.fromRGB(110, 90, 106), Color3.fromRGB(170, 120, 160), 45)
+		Grad(WmRoot, Color3.fromRGB(248, 245, 250), Color3.fromRGB(232, 225, 237), 60)
+		Grad(Stroke(WmRoot, WHITE, 1, 0.1), Color3.fromRGB(190, 165, 205), Color3.fromRGB(145, 105, 175), 45)
 		table.insert(ExtScales, New("UIScale", { Scale = ExtScale() }, WmRoot))
 		New("UIListLayout", { FillDirection = Enum.FillDirection.Horizontal, SortOrder = Enum.SortOrder.LayoutOrder,
 			VerticalAlignment = Enum.VerticalAlignment.Center, Padding = UDim.new(0, 10) }, WmRoot)
@@ -1758,8 +1758,8 @@ function Library:Window(o)
 		local T = New("TextButton", { Text = "", AutoButtonColor = false, BackgroundColor3 = WHITE,
 			Position = UDim2.new(0, 12, 0.5, -22), Size = UDim2.fromOffset(44, 44) }, Gui)
 		Corner(T, 12)
-		Grad(T, Color3.fromRGB(40, 36, 44), Color3.fromRGB(22, 20, 26), 90)
-		Stroke(T, Color3.fromRGB(110, 90, 106), 1, 0.2)
+		Grad(T, Color3.fromRGB(242, 237, 246), Color3.fromRGB(225, 217, 232), 90)
+		Stroke(T, Color3.fromRGB(190, 165, 205), 1, 0.2)
 		Icon(T, Logo, 22, 22, 26, Accent)
 		T.MouseButton1Click:Connect(function()
 			local willOpen = not Root.Visible
