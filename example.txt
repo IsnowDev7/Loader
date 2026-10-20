@@ -36,3 +36,11 @@ Main:Section({
 
 -- Permanently destroy the window and blur effect.
 -- Window:Destroy()
+
+-- Optional lifecycle automation. AutoExecute accepts a raw URL, Lua source string, or function.
+-- AutoReconnect retries the current place after teleport failures or shutdown disconnects.
+local Window = Airflow:CreateWindow({
+    Name = "My Hub",
+    AutoExecute = "https://example.com/your-script.lua",
+    AutoReconnect = true,
+})
