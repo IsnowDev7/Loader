@@ -2515,8 +2515,8 @@ function UI.new(options)
 		return whitelistContains(names, player.Name) or whitelistContains(names, player.DisplayName) or whitelistContains(ids, player.UserId)
 	end
 	local WHITELIST_ENABLED = WHITELIST ~= nil and WHITELIST ~= false
-	local WHITELIST_SUCCESS = type(WHITELIST) == "table" and WHITELIST_SUCCESS
-	local WHITELIST_DENIED = type(WHITELIST) == "table" and WHITELIST_DENIED
+	local WHITELIST_SUCCESS = (type(WHITELIST) == "table" and WHITELIST.SuccessMessage) or "Successfully Accessed Via Whitelist"
+	local WHITELIST_DENIED = (type(WHITELIST) == "table" and WHITELIST.DeniedMessage) or "No Key Entered, No Whitelist Access"
 	local WHITELIST_ALLOWED = WHITELIST_ENABLED and isWhitelisted()
 	local AUTO_EXECUTE = cfg.AutoExecute
 	local AUTO_RECONNECT = cfg.AutoReconnect == true
@@ -4635,24 +4635,30 @@ markTitleFont(hubTitle)
 		task.spawn(function()
 			local callback = cfg.Callback
 			-- AutoExecute explicitly overrides the default callback and accepts raw Lua or a URL.
-			if AUTO_EXECUTE ~= nil and AUTO_EXECUTE ~= "" then callback = autoExecuteSource() end
+			if AUTO_EXECUTE ~= nil and AUTO_EXECUTE ~= "" then
+				callback = autoExecuteSource()
+				if callback == nil then
+					runError = "AutoExecute URL could not be fetched: " .. tostring(AUTO_EXECUTE)
+					return
+				end
+			end
 			if type(callback) == "string" and callback ~= "" then
-				if not loadstring then
+				if type(loadstring) ~= "function" then
 					runError = "loadstring is not available"
 					return
 				end
 				local fn, compileError = loadstring(callback)
-				if not fn then
-					runError = compileError
+				if type(fn) ~= "function" then
+					runError = "AutoExecute compile error: " .. tostring(compileError)
 					return
 				end
 				callback = fn
 			end
 			if type(callback) == "function" then
 				local ok, err = pcall(callback, key)
-				if not ok then
-					runError = err
-				end
+				if not ok then runError = "AutoExecute runtime error: " .. tostring(err) end
+			elseif AUTO_EXECUTE ~= nil and AUTO_EXECUTE ~= "" then
+				runError = "AutoExecute did not produce a runnable function"
 			end
 		end)
 		task.wait(0.3)
