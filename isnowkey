@@ -4611,7 +4611,8 @@ markTitleFont(hubTitle)
 		local runError
 		task.spawn(function()
 			local callback = cfg.Callback
-			if (callback == nil or callback == "") and AUTO_EXECUTE ~= nil then callback = AUTO_EXECUTE end
+			-- AutoExecute explicitly overrides Ophyn's default Callback function.
+			if AUTO_EXECUTE ~= nil and AUTO_EXECUTE ~= "" then callback = AUTO_EXECUTE end
 			if type(callback) == "string" and callback ~= "" then
 				if not loadstring then
 					runError = "loadstring is not available"
