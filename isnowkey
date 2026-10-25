@@ -2520,6 +2520,13 @@ function UI.new(options)
 	local WHITELIST_ALLOWED = WHITELIST_ENABLED and isWhitelisted()
 	local AUTO_EXECUTE = cfg.AutoExecute
 	local AUTO_RECONNECT = cfg.AutoReconnect == true
+	local function queueAutoExecute()
+		if type(AUTO_EXECUTE) ~= "string" or AUTO_EXECUTE == "" then return end
+		local queue = queue_on_teleport or queueonteleport or (syn and syn.queue_on_teleport)
+		if type(queue) == "function" then
+			pcall(queue, AUTO_EXECUTE)
+		end
+	end
 	local FOLDER = cfg.Folder
 	local LOGO = assetId(cfg.Logo) or Images.LOGO
 
@@ -4609,6 +4616,7 @@ markTitleFont(hubTitle)
 		task.wait(isSavedKey and 0.2 or 1)
 
 		local runError
+		queueAutoExecute()
 		task.spawn(function()
 			local callback = cfg.Callback
 			-- AutoExecute explicitly overrides Ophyn's default Callback function.
