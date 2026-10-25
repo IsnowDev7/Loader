@@ -2520,12 +2520,26 @@ function UI.new(options)
 	local WHITELIST_ALLOWED = WHITELIST_ENABLED and isWhitelisted()
 	local AUTO_EXECUTE = cfg.AutoExecute
 	local AUTO_RECONNECT = cfg.AutoReconnect == true
-	local function queueAutoExecute()
-		if type(AUTO_EXECUTE) ~= "string" or AUTO_EXECUTE == "" then return end
-		local queue = queue_on_teleport or queueonteleport or (syn and syn.queue_on_teleport)
-		if type(queue) == "function" then
-			pcall(queue, AUTO_EXECUTE)
+	local function autoExecuteSource()
+		if type(AUTO_EXECUTE) ~= "string" or AUTO_EXECUTE == "" then return nil end
+		if AUTO_EXECUTE:match("^https?://") then
+			local ok, source = pcall(game.HttpGet, game, AUTO_EXECUTE)
+			return ok and type(source) == "string" and source or nil
 		end
+		return AUTO_EXECUTE
+	end
+	local function autoExecuteTeleportCode()
+		if type(AUTO_EXECUTE) ~= "string" or AUTO_EXECUTE == "" then return nil end
+		if AUTO_EXECUTE:match("^https?://") then
+			return 'loadstring(game:HttpGet(' .. string.format("%q", AUTO_EXECUTE) .. '))()'
+		end
+		return AUTO_EXECUTE
+	end
+	local function queueAutoExecute()
+		local source = autoExecuteTeleportCode()
+		if not source then return end
+		local queue = queue_on_teleport or queueonteleport or (syn and syn.queue_on_teleport)
+		if type(queue) == "function" then pcall(queue, source) end
 	end
 	local FOLDER = cfg.Folder
 	local LOGO = assetId(cfg.Logo) or Images.LOGO
@@ -4619,8 +4633,8 @@ markTitleFont(hubTitle)
 		queueAutoExecute()
 		task.spawn(function()
 			local callback = cfg.Callback
-			-- AutoExecute explicitly overrides Ophyn's default Callback function.
-			if AUTO_EXECUTE ~= nil and AUTO_EXECUTE ~= "" then callback = AUTO_EXECUTE end
+			-- AutoExecute explicitly overrides the default callback and accepts raw Lua or a URL.
+			if AUTO_EXECUTE ~= nil and AUTO_EXECUTE ~= "" then callback = autoExecuteSource() end
 			if type(callback) == "string" and callback ~= "" then
 				if not loadstring then
 					runError = "loadstring is not available"
