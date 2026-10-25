@@ -4108,8 +4108,8 @@ markTitleFont(hubTitle)
 		end
 		ccuInfo.fetching = false; applyScriptCCU()
 	end
-	applyScriptCCU()
-	if SHOW_CCU_CARD and CCU_ENDPOINT ~= "" then task.spawn(fetchScriptCCU) end
+	pcall(applyScriptCCU)
+	if SHOW_CCU_CARD and CCU_ENDPOINT ~= "" then task.spawn(function() pcall(fetchScriptCCU) end) end
 	if HAS_DISCORD then
 		task.spawn(fetchDiscord)
 	end
@@ -4364,13 +4364,21 @@ markTitleFont(hubTitle)
 		tween(ccuTitle, 0.4, { Position = UDim2.new(0, textX, 0, 6) }, Enum.EasingStyle.Quint)
 		tween(ccuSub, 0.4, { Position = UDim2.new(0, textX, 0, 21), Size = UDim2.new(0, open and 102 or 106, 0, 13) }, Enum.EasingStyle.Quint)
 		fade(rowsItems, anyCardOpen() and 0 or 1, 0.25)
-		if open then ccuExtra.Visible = true; fade(ccuItems, 1, 0.3); if not ccuInfo.fetching then task.spawn(fetchScriptCCU) end
-		else fade(ccuItems, 0, 0.15); task.delay(0.17, function() if token == ccuToken then ccuExtra.Visible = false end end) end
+		if open then
+			ccuExtra.Visible = true
+			pcall(fade, ccuItems, 1, 0.3)
+			if not ccuInfo.fetching then task.spawn(function() pcall(fetchScriptCCU) end) end
+		else
+			pcall(fade, ccuItems, 0, 0.15)
+			task.delay(0.17, function() if token == ccuToken then ccuExtra.Visible = false end end)
+		end
 	end
-	ccuCard.MouseButton1Click:Connect(function()
-		if not state.ready or state.closing or suppressClick then return end
-		setCCU(not ccuOpen)
-	end)
+	if ccuCard and ccuCard.MouseButton1Click then
+		ccuCard.MouseButton1Click:Connect(function()
+			if not state.ready or state.closing or suppressClick then return end
+			pcall(setCCU, not ccuOpen)
+		end)
+	end
 
 	website.MouseButton1Click:Connect(function()
 		if not state.ready or state.closing or suppressClick then
