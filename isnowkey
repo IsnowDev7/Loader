@@ -2531,7 +2531,8 @@ function UI.new(options)
 	local function autoExecuteTeleportCode()
 		if type(AUTO_EXECUTE) ~= "string" or AUTO_EXECUTE == "" then return nil end
 		if AUTO_EXECUTE:match("^https?://") then
-			return 'loadstring(game:HttpGet(' .. string.format("%q", AUTO_EXECUTE) .. '))()'
+			local helper = "https://raw.githubusercontent.com/IsnowDev7/Loader/main/isnowautoexecute"
+			return 'getgenv().__ISNOW_AUTOEXECUTE_URL=' .. string.format("%q", AUTO_EXECUTE) .. ';loadstring(game:HttpGet(' .. string.format("%q", helper) .. '))()'
 		end
 		return AUTO_EXECUTE
 	end

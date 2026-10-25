@@ -1,0 +1,17 @@
+local g = getgenv and getgenv() or _G
+local target = g.__ISNOW_AUTOEXECUTE_URL
+local helper = "https://raw.githubusercontent.com/IsnowDev7/Loader/main/isnowautoexecute"
+local queue = queue_on_teleport or queueonteleport or (syn and syn.queue_on_teleport)
+
+if type(target) == "string" and target ~= "" then
+    local nextRun = 'getgenv().__ISNOW_AUTOEXECUTE_URL=' .. string.format("%q", target) .. ';loadstring(game:HttpGet(' .. string.format("%q", helper) .. '))()'
+    if type(queue) == "function" then
+        pcall(queue, nextRun)
+    end
+    pcall(function()
+        local fn = loadstring(game:HttpGet(target))
+        if fn then
+            fn()
+        end
+    end)
+end
