@@ -2605,6 +2605,11 @@ function UI.new(options)
 	local SHOW_DISCORD_CARD = cardFlag(true, "Discord", "discord")
 	local SHOW_WEBSITE_CARD = cardFlag(HAS_WEBSITE, "Website", "website")
 	local SHOW_INFO_CARD = cardFlag(true, "Informations", "Information", "informations", "information")
+	local CCU_CFG = type(cfg.ScriptCCU) == "table" and cfg.ScriptCCU or {}
+	local SHOW_CCU_CARD = asBool(CCU_CFG.Enabled, false)
+	local CCU_SCRIPT_ID = tostring(CCU_CFG.ScriptId or "44238")
+	local CCU_ENDPOINT = tostring(CCU_CFG.Endpoint or "")
+	local CCU_API_KEY = tostring(CCU_CFG.ApiKey or "")
 	-- Only Discord enabled (no Website card): it starts expanded to fill the free space
 	local SHOW_INTRO = cardFlag(true, "Intro", "intro")
 
@@ -3524,8 +3529,10 @@ markTitleFont(hubTitle)
 	end
 
 	local discord, discordIcon, discordTitle, discordSub = linkButton(158, "Discord", INVITE_DISPLAY, Images.DISCORD)
-	local website = linkButton(206, "Website", WEBSITE_DISPLAY, Images.LINK)
+	local ccuCard, ccuIcon, ccuTitle, ccuSub = linkButton(206, "Script CCU", "Loading...", Images.KEY)
+	local website = linkButton(254, "Website", WEBSITE_DISPLAY, Images.LINK)
 	discord.Visible = SHOW_DISCORD_CARD
+	ccuCard.Visible = SHOW_CCU_CARD
 	website.Visible = SHOW_WEBSITE_CARD
 	discordTitle.TextTruncate = Enum.TextTruncate.AtEnd
 
@@ -3573,6 +3580,21 @@ markTitleFont(hubTitle)
 	local discordIconItems = prep(discordIcon)
 
 	-- Information card: local stats only (valid keys, expired keys, last used)
+	local ccuExtra = frame(ccuCard, 0, 0, 147, 82)
+	ccuExtra.Visible = false
+	local ccuExtraIcon = frame(ccuExtra, 9, 7, 26, 26, "input", 0)
+	round(ccuExtraIcon, 8, "stroke")
+	icon(ccuExtraIcon, 5, 5, "accent", Images.KEY)
+	frame(ccuExtra, 10, 41, 127, 1, "stroke", 0)
+	local ccuNum = text(ccuExtra, "...", 12, 47, 62, 16, 13, "text")
+	markBoldFont(ccuNum)
+	local ccuDot = frame(ccuExtra, 12, 66, 6, 6, "success", 0)
+	make("UICorner", { CornerRadius = UDim.new(1, 0) }, ccuDot)
+	text(ccuExtra, "Online", 22, 62, 50, 14, 10, "muted")
+	local ccuItems = prep(ccuExtra)
+	local ccuOpen = false
+	local ccuToken = 0
+
 	local infoCard, infoIcon, infoTitle, infoSub = linkButton(254, "Information", "Tap to view", Images.KEY)
 	infoCard.Visible = SHOW_INFO_CARD
 	infoCard.ClipsDescendants = true
@@ -3959,12 +3981,13 @@ markTitleFont(hubTitle)
 	local httpRequest = request or http_request or (syn and syn.request) or (http and http.request)
 
 	local discordInfo = { fetching = false, ok = false, iconLoaded = false, last = 0, online = 0, offline = 0 }
+	local ccuInfo = { fetching = false, ok = false, last = 0, count = 0 }
 
 	local discordOpen = false
 	local infoOpen = false
 
 	local function anyCardOpen()
-		return discordOpen or infoOpen
+		return discordOpen or ccuOpen or infoOpen
 	end
 
 	local function refreshDiscordTitle()
@@ -4065,6 +4088,28 @@ markTitleFont(hubTitle)
 		refreshDiscordTitle()
 	end
 
+	local function applyScriptCCU()
+		if ccuInfo.ok then ccuNum.Text = formatNumber(ccuInfo.count); ccuSub.Text = "Online now"
+		elseif ccuInfo.fetching then ccuNum.Text = "..."; ccuSub.Text = "Checking..."
+		else ccuNum.Text = "N/A"; ccuSub.Text = CCU_ENDPOINT == "" and "Endpoint not set" or "Unavailable" end
+	end
+	local function fetchScriptCCU()
+		if ccuInfo.fetching or CCU_ENDPOINT == "" or not httpRequest then applyScriptCCU(); return end
+		ccuInfo.fetching = true; applyScriptCCU()
+		local headers = { ["Accept"] = "application/json" }
+		if CCU_API_KEY ~= "" then headers["Authorization"] = "Bearer " .. CCU_API_KEY end
+		local ok, res = pcall(httpRequest, { Url = CCU_ENDPOINT, Method = "GET", Headers = headers })
+		if ok and res and res.StatusCode == 200 and res.Body then
+			local okJson, data = pcall(function() return HttpService:JSONDecode(res.Body) end)
+			if okJson and type(data) == "table" then
+				local count = data.ccu or (data.counts and data.counts[CCU_SCRIPT_ID]) or data.total
+				if tonumber(count) then ccuInfo.count = tonumber(count); ccuInfo.ok = true; ccuInfo.last = os.clock() end
+			end
+		end
+		ccuInfo.fetching = false; applyScriptCCU()
+	end
+	applyScriptCCU()
+	if SHOW_CCU_CARD and CCU_ENDPOINT ~= "" then task.spawn(fetchScriptCCU) end
 	if HAS_DISCORD then
 		task.spawn(fetchDiscord)
 	end
@@ -4078,6 +4123,9 @@ markTitleFont(hubTitle)
 	if SHOW_DISCORD_CARD then
 		table.insert(cardOrder, discord)
 	end
+	if SHOW_CCU_CARD then
+		table.insert(cardOrder, ccuCard)
+	end
 	if SHOW_KEYLESS_CARD then
 		table.insert(cardOrder, keylessCard)
 	end
@@ -4090,6 +4138,9 @@ markTitleFont(hubTitle)
 
 	local function cardHeight(card)
 		if card == discord and discordOpen then
+			return 82
+		end
+		if card == ccuCard and ccuOpen then
 			return 82
 		end
 		if card == infoCard and infoOpen then
@@ -4306,6 +4357,21 @@ markTitleFont(hubTitle)
 	linkHit.MouseLeave:Connect(function()
 		tween(discordSub, 0.15, { TextColor3 = C.muted })
 	end)
+	local function setCCU(open)
+		ccuOpen = open; ccuToken += 1; local token = ccuToken
+		local textX = open and 40 or 36
+		layoutCards(false, open and ccuCard or nil)
+		tween(ccuTitle, 0.4, { Position = UDim2.new(0, textX, 0, 6) }, Enum.EasingStyle.Quint)
+		tween(ccuSub, 0.4, { Position = UDim2.new(0, textX, 0, 21), Size = UDim2.new(0, open and 102 or 106, 0, 13) }, Enum.EasingStyle.Quint)
+		fade(rowsItems, anyCardOpen() and 0 or 1, 0.25)
+		if open then ccuExtra.Visible = true; fade(ccuItems, 1, 0.3); if not ccuInfo.fetching then task.spawn(fetchScriptCCU) end
+		else fade(ccuItems, 0, 0.15); task.delay(0.17, function() if token == ccuToken then ccuExtra.Visible = false end end) end
+	end
+	ccuCard.MouseButton1Click:Connect(function()
+		if not state.ready or state.closing or suppressClick then return end
+		setCCU(not ccuOpen)
+	end)
+
 	website.MouseButton1Click:Connect(function()
 		if not state.ready or state.closing or suppressClick then
 			return
