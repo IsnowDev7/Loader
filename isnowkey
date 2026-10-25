@@ -1,5 +1,6 @@
 local __modules = {}
 local __cache = {}
+local Lighting = game:GetService("Lighting")
 
 local function import(path)
 	local cached = __cache[path]
@@ -2939,6 +2940,37 @@ function UI.new(options)
 	local snapLocked = false
 
 	local root = Instance.new("ScreenGui")
+	local backgroundBlur
+	local blurGeneration = 0
+	local function startBackgroundBlur()
+		blurGeneration += 1
+		for _, effect in ipairs(Lighting:GetChildren()) do
+			if effect:IsA("BlurEffect") and effect.Name == "IsnowKeyBackgroundBlur" then effect:Destroy() end
+		end
+		local effect = Instance.new("BlurEffect")
+		effect.Name = "IsnowKeyBackgroundBlur"
+		effect.Size = 0
+		effect.Parent = Lighting
+		backgroundBlur = effect
+		tween(effect, 0.35, { Size = 18 }, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+	end
+	local function stopBackgroundBlur()
+		blurGeneration += 1
+		local generation = blurGeneration
+		local effect = backgroundBlur
+		backgroundBlur = nil
+		if effect and effect.Parent then
+			tween(effect, 0.25, { Size = 0 }, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
+		end
+		task.delay(0.28, function()
+			if generation ~= blurGeneration then return end
+			if effect and effect.Parent then effect:Destroy() end
+			for _, candidate in ipairs(Lighting:GetChildren()) do
+				if candidate:IsA("BlurEffect") and candidate.Name == "IsnowKeyBackgroundBlur" then candidate:Destroy() end
+			end
+		end)
+	end
+	root.Destroying:Connect(stopBackgroundBlur)
 	root.Name = "ophyn-ui-wow"
 	root.Enabled = true
 	root.DisplayOrder = 999
@@ -4722,6 +4754,7 @@ markTitleFont(hubTitle)
 		end
 		state.closing = true
 		state.ready = false
+		stopBackgroundBlur()
 		notifs.dismissAll()
 
 		tintTo(closeIcon, C.muted)
@@ -4850,6 +4883,7 @@ markTitleFont(hubTitle)
 	root:GetPropertyChangedSignal("AbsoluteSize"):Connect(snap)
 
 	task.spawn(function()
+		startBackgroundBlur()
 		if SHOW_INTRO then
 			main.Size = UDim2.new(0, INTRO_SIZE - 20, 0, INTRO_SIZE - 20)
 			tween(main, 0.6, { Size = UDim2.new(0, INTRO_SIZE, 0, INTRO_SIZE) }, Enum.EasingStyle.Quint)
